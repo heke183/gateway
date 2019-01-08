@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="gatewayConfigRepository" class="com.xianglin.gateway.core.service.repository.impl.GatewayConfigRepositoryImpl">
+		<property name="gatewayConfigItemDAO" ref="gatewayConfigItemDAO" />
+		<property name="systemName" value="${system.name}" />
+	</bean>
+
+	<bean id="groovyScriptExecutorRepository" class="com.xianglin.gateway.core.service.repository.impl.GroovyScriptExecutorRepositoryImpl">
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+		<property name="groovyScriptDAO" ref="groovyScriptDAO" />
+		<property name="systemName" value="${system.name}" />
+	</bean>
+
+	<bean id="gatewayServiceConfigRepository" class="com.xianglin.gateway.core.service.repository.impl.GatewayServiceConfigRepositoryImpl">
+		<property name="gatewayServiceConfigDAO" ref="gatewayServiceConfigDAO" />
+		<property name="systemName" value="${system.name}" />
+	</bean>
+
+	<bean id="referenceConfigRepository" class="com.xianglin.gateway.core.service.repository.impl.ReferenceConfigRepositoryImpl">
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+		<property name="systemName" value="${system.name}" />
+		<property name="registryConfig">
+			<bean id="registryConfig" class="com.alibaba.dubbo.config.RegistryConfig">
+				<property name="address" value="${registry.address}" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="gatewayServiceRepository" class="com.xianglin.gateway.core.service.repository.impl.GatewayServiceRepositoryImpl">
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+		<property name="referenceConfigRepository" ref="referenceConfigRepository" />
+	</bean>
+
+	<bean id="gatewayServiceInvoker" class="com.xianglin.gateway.core.service.rpc.impl.GatewayServiceInvokerWrapper">
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+		<property name="gatewayServiceInvoker" ref="jsonGatewayServiceInvoker" />
+		<property name="groovyScriptExecutorRepository" ref="groovyScriptExecutorRepository" />
+	</bean>
+
+	<bean id="jsonGatewayServiceInvoker" class="com.xianglin.gateway.core.service.rpc.impl.JSONGatewayServiceInvoker">
+		<property name="gatewayServiceRepository" ref="gatewayServiceRepository" />
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+	</bean>
+
+	<bean id="signatureService" class="com.xianglin.gateway.core.service.signature.impl.SignatureServiceImpl">
+		<property name="privateKeyBase64"
+			value="MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAML0HHitNauxwk03rLjDzozzJy9s3AK5c999xH6QDea1HmElQJVgV2mMhmoc0090NUVBH/Dib2z4poDnmaYin/pAr+2ZfDyN54r1jK9yQk4eCie5YMHlpB0hlrRsi7eb2T1y0tCqeNS5kjxWALXlp7Qf853pJD4XJbL+oqIxRofPAgMBAAECgYEAkX12JgU10Z2GYPQUvYq7gesQqk72Xj4ioH6Oftlo1m0CcANKEHBmq8mIonZCqMAT5Uw11yJVf6CNOhQdUaPzeJUAgGPiyP6KmOtoJtCVWwv0EUUsc4X666Xmq3N37ILJmHlmgE64tX8UZI+gb4KKm9oqkObS321f5A9bBTxTZfkCQQDjaOsQZZ3SqOzCIBemzo1gPYfXuRi3qQ6cAV9aHpaoT/iBvg1nNvpnvBJ8Js2aX6AUBpoccz+VAow06N1OcI4dAkEA23aaPz+ZbBb7bBGFkhLn/xG/EM0I4ohPH5Uls59PJ7svxPTzY98buOS+HXjT6YQvmGzxnn7UBAceuzNHN1K52wJAbVaGno2dAipCG1v+wy7QfpNW+vt9zOA1rABk7hmC6k3497h/DT87yiB86sBlXnHXr4k1E7S9v1FIRDAqJ4qqaQJAOjNFzKgtI8EkhBBRf9+LrtUh+m6lgI3tjc6b5PrGnx7BGFZthXrRe0MON/qnGDJ5/M5HdWTlDPxmZfa/WCiUKQJBANzt2UshYy9N8GMaWo6lMVzn+sdl9FRn2Civ2mVVoY6Km0EWhb+ERoHKp9PVoFXaAo/FAiqkt6rzwnnNMOqFJoY=" />
+		<property name="publicKeyBase64"
+			value="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDC9Bx4rTWrscJNN6y4w86M8ycvbNwCuXPffcR+kA3mtR5hJUCVYFdpjIZqHNNPdDVFQR/w4m9s+KaA55mmIp/6QK/tmXw8jeeK9YyvckJOHgonuWDB5aQdIZa0bIu3m9k9ctLQqnjUuZI8VgC15ae0H/Od6SQ+FyWy/qKiMUaHzwIDAQAB" />
+	</bean>
+
+</beans>

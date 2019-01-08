@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- session仓库 -->
+	<bean id="sessionRepository" class="com.xianglin.fala.session.RedisSessionRepository">
+		<property name="sessionIdPrefix" value="${session.id.prefix}" />
+		<property name="defaultMaxInactiveInterval" value="${session.timeout}" />
+		<property name="redisClient">
+			<bean class="com.xianglin.fala.session.RedisClient" init-method="init" destroy-method="destroy">
+				<property name="redisHosts" value="${session.redis.hosts}" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="gatewayServiceProcessor" class="com.xianglin.gateway.biz.shared.impl.GatewayServiceProcessorImpl">
+		<property name="preProcessor" ref="preProcessor" />
+		<property name="postProcessor" ref="postProcessor" />
+		<property name="gatewayServiceInvoker" ref="gatewayServiceInvoker" />
+		<property name="securityFilterChain" ref="securityFilterChain" />
+	</bean>
+
+	<bean id="preProcessor" class="com.xianglin.gateway.biz.shared.impl.ChangeSessionPreProcessor">
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+		<property name="sessionRepository" ref="sessionRepository" />
+	</bean>
+
+	<bean id="postProcessor" class="com.xianglin.gateway.biz.shared.impl.DeleteSessionPostProcessor">
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+	</bean>
+
+	<bean id="securityFilterChain" class="com.xianglin.gateway.biz.shared.security.SecurityFilterChain">
+		<property name="securityFilterList">
+			<list>
+				<ref bean="operationFilter" />
+				<ref bean="digestFilter" />
+				<ref bean="deviceIdFilter" />
+				<ref bean="loginStatusFilter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="deviceIdFilter" class="com.xianglin.gateway.biz.shared.security.DeviceIdFilter">
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+	</bean>
+
+	<bean id="digestFilter" class="com.xianglin.gateway.biz.shared.security.DigestFilter">
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+	</bean>
+
+	<bean id="loginStatusFilter" class="com.xianglin.gateway.biz.shared.security.LoginStatusFilter">
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+	</bean>
+
+	<bean id="operationFilter" class="com.xianglin.gateway.biz.shared.security.OperationFilter">
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+	</bean>
+
+	<bean id="signatureFilter" class="com.xianglin.gateway.biz.shared.security.SignatureFilter">
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+		<property name="signatureService" ref="signatureService" />
+	</bean>
+
+	<bean id="messageSubscriber" class="com.xianglin.gateway.biz.shared.notifyer.impl.ZookeeperMessageSubscriber">
+		<property name="notifyServerAddress" value="${notify.server.address}" />
+		<property name="notifyPath" value="${notify.path}" />
+		<property name="notifyNamespase" value="${notify.namespase}" />
+		<property name="listenerMap">
+			<map>
+				<entry key="refreshGatewayConfig" value-ref="refreshGatewayConfigListener"></entry>
+				<entry key="refreshGatewayServiceConfig" value-ref="refreshGatewayServiceConfigListener"></entry>
+				<entry key="refreshGroovyScript" value-ref="refreshGroovyScriptListener"></entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="refreshGatewayConfigListener" class="com.xianglin.gateway.biz.shared.notifyer.impl.RefreshGatewayConfigMessageListener">
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+	</bean>
+
+	<bean id="refreshGatewayServiceConfigListener" class="com.xianglin.gateway.biz.shared.notifyer.impl.RefreshGatewayServiceMessageListener">
+		<property name="gatewayServiceRepository" ref="gatewayServiceRepository" />
+	</bean>
+
+	<bean id="refreshGroovyScriptListener" class="com.xianglin.gateway.biz.shared.notifyer.impl.RefreshGroovyScriptMessageListener">
+		<property name="groovyScriptExecutorRepository" ref="groovyScriptExecutorRepository" />
+	</bean>
+
+</beans>

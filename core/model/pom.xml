@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.xianglin.gateway</groupId>
+		<artifactId>gateway-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>gateway-core-model</artifactId>
+
+	<name>gateway-core-model</name>
+	<url>http://maven.apache.org</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.xianglin.gateway</groupId>
+			<artifactId>gateway-common-dal</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.xianglin.gateway</groupId>
+			<artifactId>gateway-common-service-integration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.xianglin.gateway</groupId>
+			<artifactId>gateway-common-service-facade</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.xianglin.gateway</groupId>
+			<artifactId>gateway-common-service-spi</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.xianglin.fala</groupId>
+			<artifactId>fala-session</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<filters>
+			<filter>../../${env}-config.properties</filter>
+		</filters>
+	</build>
+
+</project>

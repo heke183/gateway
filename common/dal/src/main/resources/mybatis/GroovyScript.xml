@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xianglin.gateway.common.dal.daointerface.GroovyScriptDAO">
+
+	<resultMap id="groovyScriptMap" type="GroovyScriptDO">
+		<id property="id" column="id" />
+		<result property="gatewayServiceAlias" column="gateway_service_alias" />
+		<result property="script" column="script" />
+		<!-- 
+		<result property="gatewayName" column="gateway_name" />
+		<result property="status" column="status" />
+		<result property="creator" column="creator" />
+		<result property="updater" column="updater" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="comment" column="comment" />
+		 -->
+	</resultMap>
+
+	<sql id="columns">
+		id,gateway_service_alias,script
+	</sql>
+
+	<select id="getAllEnable" resultMap="groovyScriptMap">
+		select
+		<include refid="columns" />
+		from gateway_groovy_script
+		where gateway_name = #{gatewayName} and status = 'ENABLE'
+	</select>
+
+</mapper> 

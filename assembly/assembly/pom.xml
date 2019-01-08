@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.xianglin.gateway</groupId>
+		<artifactId>gateway-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>gateway-assembly-assembly</artifactId>
+	<packaging>war</packaging>
+
+	<name>gateway-assembly-assembly</name>
+	<url>http://maven.apache.org</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.xianglin.gateway</groupId>
+			<artifactId>gateway-web-home</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.xianglin.gateway</groupId>
+			<artifactId>gateway-biz-service-implement</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<filters>
+			<filter>../../${env}-config.properties</filter>
+		</filters>
+		<plugins>
+			<!-- war打包插件, 设定war包名称不带版本号 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warName>gateway-${env}-${project.version}.${svnVersion}</warName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

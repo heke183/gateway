@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	default-autowire="byName">
+
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.xianglin.gateway.web" />
+
+	<bean id="uncaughtExceptionResolver" class="com.xianglin.gateway.web.home.exceptionresolver.UncaughtExceptionResolver" />
+
+	<bean id="sessionInterceptor" class="com.xianglin.gateway.web.home.interceptor.SessionInterceptor">
+		<property name="sessionRepository" ref="sessionRepository" />
+		<property name="sessionCookieHelper" ref="sessionCookieHelper" />
+		<property name="gatewayConfigRepository" ref="gatewayConfigRepository" />
+		<property name="env" value="${env}" />
+	</bean>
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/mgw.htm" />
+			<mvc:mapping path="/api.json" />
+			<mvc:mapping path="/api.prot" />
+			<beans:ref bean="sessionInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<bean id="apiController" class="com.xianglin.gateway.web.home.controller.ApiController">
+		<property name="gatewayServiceProcessor" ref="gatewayServiceProcessor" />
+		<property name="gatewayServiceConfigRepository" ref="gatewayServiceConfigRepository" />
+		<property name="gatewayRequestFactory" ref="gatewayRequestFactory" />
+		<property name="sessionCookieHelper" ref="sessionCookieHelper" />
+		<property name="env" value="${env}" />
+	</bean>
+
+	<bean id="sessionCookieHelper" class="com.xianglin.gateway.web.home.util.SessionCookieHelper">
+		<property name="sessionCookieName" value="${session.cookie.name}" />
+		<property name="sessionCookieDomain" value="${session.cookie.domain}" />
+		<property name="sessionCookiePath" value="${session.cookie.path}" />
+		<property name="sessionCookieHttpOnly" value="${session.cookie.httponly}" />
+		<property name="sessionCookieSecure" value="${session.cookie.secure}" />
+		<property name="sessionCookieMaxAge" value="${session.cookie.maxage}" />
+	</bean>
+
+	<bean id="gatewayRequestFactory" class="com.xianglin.gateway.web.home.util.GatewayRequestFactory">
+		<property name="env" value="${env}" />
+	</bean>
+
+
+
+</beans>
